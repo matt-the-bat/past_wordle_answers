@@ -1,12 +1,13 @@
 # Introduction
-
-past_wordle_answers is a Python script that checks rockpapershotgun.com 's list of past answers for Wordle.
+past_wordle_answers is a Python script that checks rockpapershotgun.com's [https://www.rockpapershotgun.com/wordle-past-answers](list of past answers) for Wordle.
 
 I couldn't find reliable word lists, nor chronological time-stamped ones to reference. So the solution was to query a website, oh well.
 
 # Requirements
 `requests` and `beautifulsoup4` for the querying.
+
 `rich` to throw in some color text.
+
 The included `5_letter_words` to check spelling.
 
 # Usage
