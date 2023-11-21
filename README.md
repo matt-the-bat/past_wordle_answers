@@ -1,5 +1,5 @@
 # Introduction
-past_wordle_answers is a Python script that checks rockpapershotgun.com's (list of past answers)[https://www.rockpapershotgun.com/wordle-past-answers] for Wordle.
+past_wordle_answers is a Python script that checks rockpapershotgun.com's [list of past answers](https://www.rockpapershotgun.com/wordle-past-answers) for Wordle.
 
 I couldn't find reliable word lists, nor chronological time-stamped ones to reference. So the solution was to query a website, oh well.
 
