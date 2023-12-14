@@ -1,10 +1,11 @@
 #!/usr/bin/env python
-""" Guess against the previous answers (and dictionary)
+""" Check your Wordle guess against previous answers
     provided by rockpapershotgun.com
 """
 import requests
 from bs4 import BeautifulSoup, Tag
 from rich import print, console
+from pathlib import Path
 
 
 class WordRetrievalError(LookupError, ConnectionError):
@@ -42,7 +43,10 @@ def pastAnswers() -> list:
         raise WordRetrievalError()
 
 
-with open('5_letter_words.txt', 'r') as f:
+""" Build list of 5-letter words """
+script_dir = Path(__file__).parent
+fives = "5_letter_words.txt"
+with open(script_dir / fives, 'r') as f:
     dictionary = [x.strip().upper() for x in f.readlines()]
 
 pastAnswersList = pastAnswers()
@@ -54,13 +58,13 @@ while True:  # loop works great for keyboardinterrupt
         guessT = '[u]Guess[/u]: '
         guess = console.Console().input(guessT).upper()
         if guess in pastAnswersList:
-            print(f'❌ [red]{guess}[/red] was previously used.\n')
+            print(f'❌ [red]{guess} was previously used.[/red]\n')
         elif guess.isalpha() is False:
-            print('[red]Invalid input[/red]\n')
+            print('🚫 [red]Invalid input. Use Ctrl+D to exit.[/red]\n')
         elif len(guess) != 5:
-            print('Guess is not 5 letters long\n')
+            print('5️⃣  [red]Guess is not 5 letters long.[/red]\n')
         elif guess not in dictionary:
-            print('[red]Not in dictionary[/red]\n')
+            print('📖 [red]Not in dictionary[/red]\n')
         else:
             print('✅ [green]Try it![/green]\n')
 
