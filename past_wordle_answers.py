@@ -6,6 +6,8 @@ import requests
 from bs4 import BeautifulSoup, Tag
 from rich import print, console
 from pathlib import Path
+import os
+import atexit
 
 
 class WordRetrievalError(LookupError, ConnectionError):
@@ -44,7 +46,7 @@ def pastAnswers() -> list:
 
 
 """ Build list of 5-letter words """
-script_dir = Path(__file__).parent
+script_dir = Path(__file__).resolve().parent
 fives = "5_letter_words.txt"
 with open(script_dir / fives, 'r') as f:
     dictionary = [x.strip().upper() for x in f.readlines()]
@@ -72,3 +74,9 @@ while True:  # loop works great for keyboardinterrupt
         raise KeyboardInterrupt
     except EOFError:
         break
+
+
+@atexit.register
+def bye():
+    os.system('clear')
+
