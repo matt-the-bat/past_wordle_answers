@@ -78,5 +78,4 @@ while True:  # loop works great for keyboardinterrupt
 
 @atexit.register
 def bye():
-    os.system('clear')
-
+    os.system('reset')
