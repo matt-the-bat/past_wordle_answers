@@ -1,11 +1,27 @@
 #!/usr/bin/env python
-""" Check your Wordle guess against previous answers
+"""
+    Check your Wordle guess against previous answers
     provided by rockpapershotgun.com
 """
+from typing import List
 import requests
 from bs4 import BeautifulSoup, Tag
 from rich import print, console
+from rich.columns import Columns
 from pathlib import Path
+import argparse
+import clipman  # type: ignore
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "-p",
+    "--paste",
+    action="store_true",
+    help="Paste Anagram Solver output",
+)
+
+args = parser.parse_args()
 
 
 class WordRetrievalError(LookupError, ConnectionError):
@@ -20,7 +36,7 @@ def pastAnswers() -> list:
     url = "https://www.rockpapershotgun.com/wordle-past-answers"
     try:
         print("Querying website...\n")
-        response = requests.get(url, timeout=4)
+        response = requests.get(url, timeout=14)
     except ConnectionError:
         raise
     html_content = response.text
@@ -33,7 +49,11 @@ def pastAnswers() -> list:
         ul_tag = h2_tag.find_next_sibling("ul", class_="inline")
         if ul_tag:
             # Find all <li> tags within the <ul> tag
-            li_tags = [li_tag for li_tag in ul_tag if isinstance(li_tag, Tag)]
+            li_tags = [
+                li_tag
+                for li_tag in ul_tag
+                if isinstance(li_tag, Tag)
+            ]
             # Extract the contents of each <li> tag
             li_contents = [li_tag.text for li_tag in li_tags]
             # Print the contents of all <li> tags
@@ -52,24 +72,56 @@ with open(script_dir / fives, "r") as f:
 
 pastAnswersList = pastAnswers()
 
-# Prompts
-print("[yellow3]Do not guess -s (plurals or verbs)[/yellow3]")
-while True:  # loop works great for keyboardinterrupt
-    try:
-        guessT = "[u]Guess[/u]: "
-        guess = console.Console().input(guessT).upper()
-        if guess in pastAnswersList:
-            print(f"❌ [red]{guess} was previously used.[/red]\n")
-        elif guess.isalpha() is False:
-            print("🚫 [red]Invalid input. Use Ctrl+D to exit.[/red]\n")
-        elif len(guess) != 5:
-            print("5️⃣  [red]Guess is not 5 letters long.[/red]\n")
-        elif guess not in dictionary:
-            print("📖 [red]Not in dictionary[/red]\n")
-        else:
-            print("✅ [green]Try it![/green]\n")
 
-    except KeyboardInterrupt:
-        raise KeyboardInterrupt
-    except EOFError:
-        break
+def resolve_guess(guess) -> str:
+    """Ayyyy lmao"""
+    guess = guess.upper()
+    if guess in pastAnswersList:
+        return f"❌ [red]{guess} was previously used.[/red]"
+    elif guess.isalpha() is False:
+        return "🚫 [red]Invalid input. Use Ctrl+D to exit.[/red]"
+    elif len(guess) != 5:
+        return "5️⃣  [red]Guess is not 5 letters long.[/red]"
+    elif guess not in dictionary:
+        return "📖 [red]Not in dictionary[/red]"
+    else:
+        return "✅ [green]Try it![/green]"
+
+
+def prompt():
+    """Interactive Mode"""
+    print(
+        "[yellow3]Hint: [/yellow3]Do not guess -s (plurals or verbs)"
+    )
+    guessT = "[u]Guess[/u]: "
+    while True:  # loop works great for keyboardinterrupt
+        try:
+            guess = console.Console().input(guessT)
+            print(resolve_guess(guess) + "\n")
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt
+        except EOFError:
+            break
+    return ""
+
+
+def with_paste() -> None:
+    """Paste from clipboard, processing Anagram Solver output"""
+    possibleWords: List[str] = []
+    clipman.init()
+    paste = list(clipman.paste().split("\n"))
+    for line in paste:
+        """Omit all non-answers, add guess if good"""
+        if line.islower() and resolve_guess(line.strip())[0] == "✅":
+            possibleWords.append(line)
+
+    """ Display """
+    columns = Columns(possibleWords, equal=True, expand=True)
+    print(columns)
+
+
+if __name__ == "__main__":
+    if args.paste:
+        with_paste()
+    else:
+        prompt()
