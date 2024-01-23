@@ -66,15 +66,14 @@ def pastAnswers() -> list:
 
 """ Build list of 5-letter words """
 script_dir = Path(__file__).resolve().parent
-fives = "5_letter_words.txt"
+fives = "all_answers.txt"
 with open(script_dir / fives, "r") as f:
-    dictionary = [x.strip().upper() for x in f.readlines()]
+    dictionary = [x.strip().split(' ')[5] for x in f.readlines()]
+pastAnswersList = pastAnswers() 
 
-pastAnswersList = pastAnswers()
 
-
-def resolve_guess(guess) -> str:
-    """Ayyyy lmao"""
+def resolve_guess(guess: str) -> str:
+    """Resolves input guess string"""
     guess = guess.upper()
     if guess in pastAnswersList:
         return f"❌ [red]{guess} was previously used.[/red]"
